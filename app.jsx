@@ -1,26 +1,53 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect  } from 'react';
 import AddPerson from './addPerson.jsx';
-import QueWrapper from './queWrapper.jsx';
+import QueueRow from './queueRow.jsx';
+
+export const storeContext = React.createContext();
 
 export default function App() {
     const [queues, setQueues] = useState([]);
 
+    const store = {
+        queues: { 
+            get: () => queues,
+            set: setQueues
+        }
+    };
+
+    const getRows = () => {
+        const newRows = [];
+        let currentRow = []
+        for (let i = 0; i < queues.length; i++) {
+            if (currentRow.length === 3) {
+                newRows.push(currentRow);
+                currentRow = [];
+            }
+            currentRow.push(queues[i]);
+        }
+        if (currentRow.length > 0) newRows.push(currentRow);
+        return newRows
+    }
+
+    let rows = getRows();
+
     useEffect(() => {
         // začetno stanje: dodamo eno demo osebo
-        setQueues([{ name: 'Jože Pločnik', tasks: ['Špecerija', 'Odnesi smeti'] }]);
+        setQueues([{ name: 'John Doe', tasks: ['Groceries', 'Take out the trash'] }]);
     }, []);
 
     console.log('render: App');
 
-    const addPeople = (name) => {
-        setQueues([...queues, { name, tasks: [] }]);
-    }
-
     return (
         <div>
-            <div className="title">Listki opravil</div>
-            <AddPerson currentPeople={queues} setPeople={setQueues} />
-            <QueWrapper queues={queues} setQueues={setQueues} />
+            <div className="title">Tasks</div>
+            <AddPerson setPeople={setQueues} currentPeople={queues} />
+            <storeContext.Provider value={store.queues} >
+                <div className="queues-wrapper">
+                    {
+                    rows.map((row, idx) => <QueueRow key={`${idx}`} idx={idx} row={row} />)
+                    }
+                </div>
+            </storeContext.Provider>
         </div>
     );
 }
