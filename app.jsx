@@ -1,11 +1,13 @@
-import React, { useState, useEffect  } from 'react';
+import React, { useState } from 'react';
 import AddPerson from './addPerson.jsx';
 import QueueRow from './queueRow.jsx';
 
 export const storeContext = React.createContext();
 
 export default function App() {
-    const [queues, setQueues] = useState([]);
+    const [queues, setQueues] = useState([
+                                    { name: 'John Doe', tasks: ['Groceries', 'Take out the trash'] }
+                                ]);
 
     const store = {
         queues: { 
@@ -30,15 +32,10 @@ export default function App() {
 
     let rows = getRows();
 
-    useEffect(() => {
-        // začetno stanje: dodamo eno demo osebo
-        setQueues([{ name: 'John Doe', tasks: ['Groceries', 'Take out the trash'] }]);
-    }, []);
-
     console.log('render: App');
 
     return (
-        <div>
+        <div> 
             <div className="title">Tasks</div>
             <AddPerson setPeople={setQueues} currentPeople={queues} />
             <storeContext.Provider value={store.queues} >
